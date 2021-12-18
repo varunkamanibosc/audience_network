@@ -15,7 +15,7 @@ dependencies:
   flutter:
     sdk: flutter
   meta: ^1.7.0
-  characters: ^1.2.0
+  characters: ^1.1.0
 
 dev_dependencies:
   flutter_test:
