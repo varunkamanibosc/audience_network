@@ -40,6 +40,7 @@ class AdsPage extends StatefulWidget {
 class AdsPageState extends State<AdsPage> {
   bool _isInterstitialAdLoaded = false;
   bool _isRewardedAdLoaded = false;
+  RewardedAd? _rewardedAd;
 
   /// All widget ads are stored in this variable. When a button is pressed, its
   /// respective ad widget is set to this variable and the view is rebuilt using
@@ -86,22 +87,24 @@ class AdsPageState extends State<AdsPage> {
   }
 
   void _loadRewardedVideoAd() {
-    FacebookRewardedVideoAd.loadRewardedVideoAd(
-      placementId: "YOUR_PLACEMENT_ID",
-      listener: (result, value) {
-        print("Rewarded Ad: $result --> $value");
-        if (result == RewardedVideoAdResult.LOADED) _isRewardedAdLoaded = true;
-        if (result == RewardedVideoAdResult.VIDEO_COMPLETE)
-
-        /// Once a Rewarded Ad has been closed and becomes invalidated,
-        /// load a fresh Ad by calling this function.
-        if (result == RewardedVideoAdResult.VIDEO_CLOSED &&
-            (value == true || value["invalidated"] == true)) {
-          _isRewardedAdLoaded = false;
-          _loadRewardedVideoAd();
-        }
+    final rewardedAd = RewardedAd('YOUR_PLACEMENT_ID');
+    rewardedAd.listener = RewardedAdListener(
+      onLoaded: () {
+        _isRewardedAdLoaded = true;
+        print('rewarded ad loaded');
+      },
+      onError: (code, message) {
+        print('rewarded ad error\ncode = $code\nmessage = $message');
+      },
+      onVideoClosed: () {
+        // already loads next ad on error
+        rewardedAd.destroy();
+        _isRewardedAdLoaded = false;
+        _loadRewardedVideoAd();
       },
     );
+    rewardedAd.load();
+    _rewardedAd = rewardedAd;
   }
 
   @override
@@ -176,10 +179,13 @@ class AdsPageState extends State<AdsPage> {
   }
 
   _showRewardedAd() {
-    if (_isRewardedAdLoaded == true)
-      FacebookRewardedVideoAd.showRewardedVideoAd();
-    else
+    final rewardedAd = _rewardedAd;
+
+    if (rewardedAd != null && _isRewardedAdLoaded) {
+      rewardedAd.show();
+    } else {
       print("Rewarded Ad not yet loaded!");
+    }
   }
 
   _showBannerAd() {
