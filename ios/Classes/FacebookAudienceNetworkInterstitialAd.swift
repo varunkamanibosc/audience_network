@@ -4,7 +4,8 @@ import FBAudienceNetwork
 
 class FacebookAudienceNetworkInterstitialAdPlugin: NSObject, FBInterstitialAdDelegate {
     let channel: FlutterMethodChannel
-    var interstitialAd: FBInterstitialAd!
+    private var adsById: [Int: FBInterstitialAd] = [:]
+    private var idsByAd: [FBInterstitialAd: Int] = [:]
     
     init(_channel: FlutterMethodChannel) {
         print("FacebookAudienceNetworkInterstitialAdPlugin > init")
@@ -23,7 +24,7 @@ class FacebookAudienceNetworkInterstitialAdPlugin: NSObject, FBInterstitialAdDel
                 result(self.showAD(call))
             case "destroyInterstitialAd":
                 print("FacebookAudienceNetworkInterstitialAdPlugin > destroyInterstitialAd")
-                result(self.destroyAd())
+                result(self.destroyAd(call))
             default:
                 result(FlutterMethodNotImplemented)
             }
@@ -34,49 +35,68 @@ class FacebookAudienceNetworkInterstitialAdPlugin: NSObject, FBInterstitialAdDel
     
     
     func loadAd(_ call: FlutterMethodCall) -> Bool {
-        if nil == self.interstitialAd || !self.interstitialAd.isAdValid {
+        let args: NSDictionary = call.arguments as! NSDictionary
+        let id = args["id"] as! Int
+        let placementId = args["placementId"] as! String
+        
+        var interstitialAd: FBInterstitialAd! = adsById[id]
+        
+        if interstitialAd == nil || !interstitialAd.isAdValid {
             print("FacebookAudienceNetworkInterstitialAdPlugin > loadAd > create")
-            let args: NSDictionary = call.arguments as! NSDictionary
-            let placementId: String = args["placementId"] as! String
-            self.interstitialAd = FBInterstitialAd.init(placementID: placementId)
-            self.interstitialAd.delegate = self
+            
+            interstitialAd = FBInterstitialAd.init(placementID: placementId)
+            interstitialAd.delegate = self
+            adsById[id] = interstitialAd
+            idsByAd[interstitialAd] = id
         }
-        self.interstitialAd.load()
+        
+        interstitialAd.load()
+        
         return true
     }
     
     func showAD(_ call: FlutterMethodCall) -> Bool {
-        if !self.interstitialAd.isAdValid {
+        let args: NSDictionary = call.arguments as! NSDictionary
+        let id: Int = args["id"] as! Int
+        let delay: Int = args["delay"] as! Int
+        
+        let interstitialAd = adsById[id]!
+        
+        if !interstitialAd.isAdValid {
             print("FacebookAudienceNetworkInterstitialAdPlugin > showAD > not AdVaild")
             return false
         }
-        let args: NSDictionary = call.arguments as! NSDictionary
-        let delay: Int = args["delay"] as! Int
         
-        //MARK:- Need to remove because it' already called with delay.
-        //self.interstitialAd.show(fromRootViewController: UIApplication.shared.keyWindow?.rootViewController)
         
         print("@@@ delay %d", delay)
         
+        func show() {
+            let rootViewController = UIApplication.shared.keyWindow?.rootViewController
+            interstitialAd.show(fromRootViewController: rootViewController)
+        }
+        
         if 0 < delay {
             let time = DispatchTime.now() + .seconds(delay)
-            DispatchQueue.main.asyncAfter(deadline: time) {
-                self.interstitialAd.show(fromRootViewController: UIApplication.shared.keyWindow?.rootViewController)
-            }
+            DispatchQueue.main.asyncAfter(deadline: time, execute: show)
         } else {
-            self.interstitialAd.show(fromRootViewController: UIApplication.shared.keyWindow?.rootViewController)
+            show()
         }
         return true
     }
     
-    func destroyAd() -> Bool {
-        if nil == self.interstitialAd {
-            return false
-        } else {
+    func destroyAd(_ call: FlutterMethodCall) -> Bool {
+        let args: NSDictionary = call.arguments as! NSDictionary
+        let id: Int = args["id"] as! Int
+        
+        let interstitialAd = adsById[id]
+        
+        if let interstitialAd = interstitialAd {
             interstitialAd.delegate = nil
-            interstitialAd = nil
+            adsById.removeValue(forKey: id)
+            idsByAd.removeValue(forKey: interstitialAd)
+            return true
         }
-        return true
+        return false
     }
     
     
@@ -89,9 +109,11 @@ class FacebookAudienceNetworkInterstitialAdPlugin: NSObject, FBInterstitialAdDel
     func interstitialAdDidClick(_ interstitialAd: FBInterstitialAd) {
         print("InterstitialAdView > interstitialAdDidClick")
         
+        let id = idsByAd[interstitialAd]!
         let placement_id: String = interstitialAd.placementID
         let invalidated: Bool = interstitialAd.isAdValid
         let arg: [String: Any] = [
+            FANConstant.ID_ARG: id,
             FANConstant.PLACEMENT_ID_ARG: placement_id,
             FANConstant.INVALIDATED_ARG: invalidated,
         ]
@@ -106,10 +128,12 @@ class FacebookAudienceNetworkInterstitialAdPlugin: NSObject, FBInterstitialAdDel
      */
     func interstitialAdDidClose(_ interstitialAd: FBInterstitialAd) {
         print("InterstitialAdView > interstitialAdDidClose")
-        //Add event for Interstitial dismissed.
+        
+        let id = idsByAd[interstitialAd]!
         let placement_id: String = interstitialAd.placementID
         let invalidated: Bool = interstitialAd.isAdValid
         let arg: [String: Any] = [
+            FANConstant.ID_ARG: id,
             FANConstant.PLACEMENT_ID_ARG: placement_id,
             FANConstant.INVALIDATED_ARG: invalidated,
         ]
@@ -133,9 +157,11 @@ class FacebookAudienceNetworkInterstitialAdPlugin: NSObject, FBInterstitialAdDel
     func interstitialAdDidLoad(_ interstitialAd: FBInterstitialAd) {
         print("InterstitialAdView > interstitialAdDidLoad")
         
+        let id = idsByAd[interstitialAd]!
         let placement_id: String = interstitialAd.placementID
         let invalidated: Bool = interstitialAd.isAdValid
         let arg: [String: Any] = [
+            FANConstant.ID_ARG: id,
             FANConstant.PLACEMENT_ID_ARG: placement_id,
             FANConstant.INVALIDATED_ARG: invalidated,
         ]
@@ -152,10 +178,12 @@ class FacebookAudienceNetworkInterstitialAdPlugin: NSObject, FBInterstitialAdDel
         print("InterstitialAdView > interstitialAd failed")
         print(error.localizedDescription)
         
+        let id = idsByAd[interstitialAd]!
         let errorDetails = FacebookAdErrorDetails(fromSDKError: error)
         let placement_id: String = interstitialAd.placementID
         let invalidated: Bool = interstitialAd.isAdValid
         let arg: [String: Any] = [
+            FANConstant.ID_ARG: id,
             FANConstant.PLACEMENT_ID_ARG: placement_id,
             FANConstant.INVALIDATED_ARG: invalidated,
             FANConstant.ERROR_CODE_ARG: errorDetails?.code as Any,
@@ -172,9 +200,11 @@ class FacebookAudienceNetworkInterstitialAdPlugin: NSObject, FBInterstitialAdDel
     func interstitialAdWillLogImpression(_ interstitialAd: FBInterstitialAd) {
         print("InterstitialAdView > interstitialAdWillLogImpression")
         
+        let id = idsByAd[interstitialAd]!
         let placement_id: String = interstitialAd.placementID
         let invalidated: Bool = interstitialAd.isAdValid
         let arg: [String: Any] = [
+            FANConstant.ID_ARG: id,
             FANConstant.PLACEMENT_ID_ARG: placement_id,
             FANConstant.INVALIDATED_ARG: invalidated,
         ]
