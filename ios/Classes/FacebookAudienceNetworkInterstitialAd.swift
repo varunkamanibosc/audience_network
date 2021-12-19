@@ -37,8 +37,8 @@ class FacebookAudienceNetworkInterstitialAdPlugin: NSObject, FBInterstitialAdDel
         if nil == self.interstitialAd || !self.interstitialAd.isAdValid {
             print("FacebookAudienceNetworkInterstitialAdPlugin > loadAd > create")
             let args: NSDictionary = call.arguments as! NSDictionary
-            let id: String = args["id"] as! String
-            self.interstitialAd = FBInterstitialAd.init(placementID: id)
+            let placementId: String = args["placementId"] as! String
+            self.interstitialAd = FBInterstitialAd.init(placementID: placementId)
             self.interstitialAd.delegate = self
         }
         self.interstitialAd.load()

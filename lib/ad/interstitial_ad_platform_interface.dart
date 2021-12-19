@@ -51,7 +51,8 @@ class InterstitialAdPlatformInterface {
   }) async {
     try {
       final args = <String, dynamic>{
-        "id": placementId,
+        "id": id,
+        "placementId": placementId,
       };
 
       final result = await _channel.invokeMethod(
