@@ -115,12 +115,16 @@ class FacebookAudienceNetwork {
   ///   'error\_message': "No internet connection",
   /// }
   /// ```
-  static Future<bool?> loadRewardedVideoAd({
+  static Future<bool?> loadRewardedVideoAd(
+    int id, {
     String placementId = "YOUR_PLACEMENT_ID",
-    Function(RewardedVideoAdResult, dynamic)? listener,
+    String? userId,
+    Function(int, RewardedVideoAdResult, dynamic)? listener,
   }) async {
     return await FacebookRewardedVideoAd.loadRewardedVideoAd(
+      id,
       placementId: placementId,
+      userId: userId,
       listener: listener,
     );
   }
@@ -139,12 +143,12 @@ class FacebookAudienceNetwork {
   ///   },
   /// );
   /// ```
-  static Future<bool?> showRewardedVideoAd({int delay = 0}) async {
-    return await FacebookRewardedVideoAd.showRewardedVideoAd(delay: delay);
+  static Future<bool?> showRewardedVideoAd(int id, {int delay = 0}) async {
+    return await FacebookRewardedVideoAd.showRewardedVideoAd(id, delay: delay);
   }
 
   /// Removes the rewarded video Ad.
-  static Future<bool?> destroyRewardedVideoAd() async {
-    return await FacebookRewardedVideoAd.destroyRewardedVideoAd();
+  static Future<bool?> destroyRewardedVideoAd(int id) async {
+    return await FacebookRewardedVideoAd.destroyRewardedVideoAd(id);
   }
 }
