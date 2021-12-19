@@ -52,7 +52,7 @@ class FacebookRewardedVideoAd {
   }) async {
     try {
       final args = <String, dynamic>{
-        "id": placementId,
+        "placementId": placementId,
         "userId": userId,
       };
 

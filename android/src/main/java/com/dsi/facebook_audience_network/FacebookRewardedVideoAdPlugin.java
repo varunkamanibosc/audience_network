@@ -52,7 +52,7 @@ class FacebookRewardedVideoAdPlugin implements MethodChannel.MethodCallHandler,
     }
 
     private boolean loadAd(HashMap args) {
-        final String placementId = (String) args.get("id");
+        final String placementId = (String) args.get("placementId");
         final String userId = (String) args.get("userId");
 
         if (rewardedVideoAd == null) {
