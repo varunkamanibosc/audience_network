@@ -79,7 +79,6 @@ FacebookInterstitialAd.loadInterstitialAd(
 ```
 ---
 ### 4. Show Rewarded Video Ad:
-(Android Only)
 
 ```dart
 FacebookRewardedVideoAd.loadRewardedVideoAd(
@@ -143,6 +142,4 @@ iOS wrapper code contribution by **lolqplay team from birdgang**
 
 ### Note: Instream video ad has been removed by Facebook. Read more [here](https://www.facebook.com/business/help/645132129564436?id=211412110064838)
 
-## Future Work
-Implement Rewarded video for iOS platform.
 
