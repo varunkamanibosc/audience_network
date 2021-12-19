@@ -20,22 +20,21 @@
 
 For testing purposes you need to obtain the hashed ID of your testing device. To obtain the hashed ID: 
 
-1. Call `FacebookAudienceNetwork.init()` during app initialization.
+1. Call `AudienceNetwork.init()` during app initialization.
 2. Place the `FacebookBannerAd` widget in your app.
 3. Run the app.
 
 The hased id will be in printed to the logcat. Paste that onto the `testingId` parameter.
 
 ```dart
-FacebookAudienceNetwork.init(
+AudienceNetwork.init(
   testingId: "37b1da9d-b48c-4103-a393-2e095e734bd6", //optional
-  iOSAdvertiserTrackingEnabled: true //default false
+  testMode: true, // optional
+  iOSAdvertiserTrackingEnabled: true, //default false
 );
 ```
 ##### IOS Setup
 In Pod file, set the IOS deployment target version to 9.0
-
-*IN iOS, Banner, Interstital and Native Ads are supported* 
 
 ---
 ### 2. Show Banner Ad:
@@ -69,27 +68,36 @@ Container(
 ### 3. Show Interstitial Ad:
 
 ```dart
-FacebookInterstitialAd.loadInterstitialAd(
-  placementId: "YOUR_PLACEMENT_ID",
-  listener: (result, value) {
-    if (result == InterstitialAdResult.LOADED)
-      FacebookInterstitialAd.showInterstitialAd(delay: 5000);
+final interstitialAd = InterstitialAd('YOUR_PLACEMENT_ID');
+interstitialAd.listener = InterstitialAdListener(
+  onLoaded: () {
+    interstitialAd.show();
+  },
+  onDismissed: () {
+    interstitialAd.destroy();
+    print('Interstitial dismissed');
   },
 );
+interstitialAd.load();
 ```
 ---
 ### 4. Show Rewarded Video Ad:
 
 ```dart
-FacebookRewardedVideoAd.loadRewardedVideoAd(
-  placementId: "YOUR_PLACEMENT_ID",
-  listener: (result, value) {
-    if(result == RewardedVideoResult.LOADED)
-      FacebookRewardedVideoAd.showRewardedVideoAd();
-    if(result == RewardedVideoResult.VIDEO_COMPLETE)
-      print("Video completed");
+final rewardedAd = RewardedAd(
+  'YOUR_PLACEMENT_ID',
+  userId: 'some_user_id', // optional for server side verification
+);
+rewardedAd.listener = RewardedAdListener(
+  onLoaded: () {
+    rewardedAd.show();
+  },
+  onVideoComplete: () {
+    rewardedAd.destroy();
+    print('Video completed');
   },
 );
+rewardedAd.load();
 ```
 ---
 ### 5. Show Native Ad:
