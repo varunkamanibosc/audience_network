@@ -15,10 +15,9 @@ import java.util.HashMap;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-class FacebookRewardedVideoAdPlugin implements MethodChannel.MethodCallHandler,
-        RewardedVideoAdListener {
-
-    private RewardedVideoAd rewardedVideoAd = null;
+class FacebookRewardedVideoAdPlugin implements MethodChannel.MethodCallHandler {
+    private HashMap<Integer, RewardedVideoAd> adsById = new HashMap<>();
+    private HashMap<RewardedVideoAd, Integer> idsByAd = new HashMap<>();
 
     private Context context;
     private MethodChannel channel;
@@ -32,7 +31,6 @@ class FacebookRewardedVideoAdPlugin implements MethodChannel.MethodCallHandler,
         _delayHandler = new Handler();
     }
 
-
     @Override
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
 
@@ -44,7 +42,7 @@ class FacebookRewardedVideoAdPlugin implements MethodChannel.MethodCallHandler,
                 result.success(loadAd((HashMap) methodCall.arguments));
                 break;
             case FacebookConstants.DESTROY_REWARDED_VIDEO_METHOD:
-                result.success(destroyAd());
+                result.success(destroyAd((HashMap) methodCall.arguments));
                 break;
             default:
                 result.notImplemented();
@@ -52,19 +50,55 @@ class FacebookRewardedVideoAdPlugin implements MethodChannel.MethodCallHandler,
     }
 
     private boolean loadAd(HashMap args) {
+        final int id = (int) args.get("id");
         final String placementId = (String) args.get("placementId");
         final String userId = (String) args.get("userId");
 
+        RewardedVideoAd rewardedVideoAd = adsById.get(id);
         if (rewardedVideoAd == null) {
             rewardedVideoAd = new RewardedVideoAd(context, placementId);
+            adsById.put(id, rewardedVideoAd);
+            idsByAd.put(rewardedVideoAd, id);
         }
         try {
             final RewardData rewardData = new RewardData(userId, null);
             if (!rewardedVideoAd.isAdLoaded()) {
+                final FacebookRewardedVideoAdPlugin self = this;
+                final RewardedVideoAd capturedAd = rewardedVideoAd;
                 RewardedVideoAd.RewardedVideoLoadAdConfig loadAdConfig = rewardedVideoAd
                         .buildLoadAdConfig()
                         .withRewardData(rewardData)
-                        .withAdListener(this)
+                        .withAdListener(new RewardedVideoAdListener() {
+                            @Override
+                            public void onRewardedVideoCompleted() {
+                                self.onRewardedVideoCompleted(capturedAd);
+                            }
+
+                            @Override
+                            public void onRewardedVideoClosed() {
+                                self.onRewardedVideoClosed(capturedAd);
+                            }
+
+                            @Override
+                            public void onError(Ad ad, AdError adError) {
+                                self.onError(ad, adError);
+                            }
+
+                            @Override
+                            public void onAdLoaded(Ad ad) {
+                                self.onAdLoaded(ad);
+                            }
+
+                            @Override
+                            public void onAdClicked(Ad ad) {
+                                self.onAdClicked(ad);
+                            }
+
+                            @Override
+                            public void onLoggingImpression(Ad ad) {
+                                self.onLoggingImpression(ad);
+                            }
+                        })
                         .build();
 
                 rewardedVideoAd.loadAd(loadAdConfig);
@@ -78,8 +112,10 @@ class FacebookRewardedVideoAdPlugin implements MethodChannel.MethodCallHandler,
     }
 
     private boolean showAd(HashMap args) {
+        final int id = (int) args.get("id");
         final int delay = (int) args.get("delay");
-
+        final RewardedVideoAd rewardedVideoAd = adsById.get(id);
+        
         if (rewardedVideoAd == null || !rewardedVideoAd.isAdLoaded())
             return false;
 
@@ -94,7 +130,6 @@ class FacebookRewardedVideoAdPlugin implements MethodChannel.MethodCallHandler,
             _delayHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-
                     if (rewardedVideoAd == null || !rewardedVideoAd.isAdLoaded())
                         return;
 
@@ -109,19 +144,27 @@ class FacebookRewardedVideoAdPlugin implements MethodChannel.MethodCallHandler,
         return true;
     }
 
-    private boolean destroyAd() {
+    private boolean destroyAd(HashMap args) {
+        final int id = (int) args.get("id");
+        final RewardedVideoAd rewardedVideoAd = adsById.get(id);
+
         if (rewardedVideoAd == null)
             return false;
         else {
             rewardedVideoAd.destroy();
-            rewardedVideoAd = null;
+            adsById.remove(id);
+            idsByAd.remove(rewardedVideoAd);
         }
         return true;
     }
 
-    @Override
-    public void onError(Ad ad, AdError adError) {
+    // MARK: delegate methods
+
+    private void onError(Ad ad, AdError adError) {
+        final int id = idsByAd.get(ad);
+
         HashMap<String, Object> args = new HashMap<>();
+        args.put("id", id);
         args.put("placement_id", ad.getPlacementId());
         args.put("invalidated", ad.isAdInvalidated());
         args.put("error_code", adError.getErrorCode());
@@ -130,40 +173,58 @@ class FacebookRewardedVideoAdPlugin implements MethodChannel.MethodCallHandler,
         channel.invokeMethod(FacebookConstants.ERROR_METHOD, args);
     }
 
-    @Override
-    public void onAdLoaded(Ad ad) {
+    private void onAdLoaded(Ad ad) {
+        final int id = idsByAd.get(ad);
+
         HashMap<String, Object> args = new HashMap<>();
+        args.put("id", id);
         args.put("placement_id", ad.getPlacementId());
         args.put("invalidated", ad.isAdInvalidated());
 
         channel.invokeMethod(FacebookConstants.LOADED_METHOD, args);
     }
 
-    @Override
-    public void onAdClicked(Ad ad) {
+    private void onAdClicked(Ad ad) {
+        final int id = idsByAd.get(ad);
+
         HashMap<String, Object> args = new HashMap<>();
+        args.put("id", id);
         args.put("placement_id", ad.getPlacementId());
         args.put("invalidated", ad.isAdInvalidated());
 
         channel.invokeMethod(FacebookConstants.CLICKED_METHOD, args);
     }
 
-    @Override
-    public void onLoggingImpression(Ad ad) {
+    private void onLoggingImpression(Ad ad) {
+        final int id = idsByAd.get(ad);
+
         HashMap<String, Object> args = new HashMap<>();
+        args.put("id", id);
         args.put("placement_id", ad.getPlacementId());
         args.put("invalidated", ad.isAdInvalidated());
 
         channel.invokeMethod(FacebookConstants.LOGGING_IMPRESSION_METHOD, args);
     }
 
-    @Override
-    public void onRewardedVideoCompleted() {
-        channel.invokeMethod(FacebookConstants.REWARDED_VIDEO_COMPLETE_METHOD, true);
+    private void onRewardedVideoCompleted(RewardedVideoAd ad) {
+        final int id = idsByAd.get(ad);
+
+        HashMap<String, Object> args = new HashMap<>();
+        args.put("id", id);
+        args.put("placement_id", ad.getPlacementId());
+        args.put("invalidated", ad.isAdInvalidated());
+
+        channel.invokeMethod(FacebookConstants.REWARDED_VIDEO_COMPLETE_METHOD, args);
     }
 
-    @Override
-    public void onRewardedVideoClosed() {
-        channel.invokeMethod(FacebookConstants.REWARDED_VIDEO_CLOSED_METHOD, true);
+    private void onRewardedVideoClosed(RewardedVideoAd ad) {
+        final int id = idsByAd.get(ad);
+
+        HashMap<String, Object> args = new HashMap<>();
+        args.put("id", id);
+        args.put("placement_id", ad.getPlacementId());
+        args.put("invalidated", ad.isAdInvalidated());
+
+        channel.invokeMethod(FacebookConstants.REWARDED_VIDEO_CLOSED_METHOD, args);
     }
 }
