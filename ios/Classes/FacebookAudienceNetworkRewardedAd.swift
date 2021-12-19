@@ -42,8 +42,12 @@ class FacebookAudienceNetworkRewardedAdPlugin: NSObject, FBRewardedVideoAdDelega
         if nil == self.rewardedVideoAd || !self.rewardedVideoAd.isAdValid {
             print("FacebookAudienceNetworkRewardedAdPlugin > loadAd > create")
             let args: NSDictionary = call.arguments as! NSDictionary
-            let id: String = args["id"] as! String
-            self.rewardedVideoAd = FBRewardedVideoAd.init(placementID: id)
+            let placementId = args["id"] as! String
+            let userId = args["userId"] as? String
+            self.rewardedVideoAd = FBRewardedVideoAd(
+                placementID: placementId,
+                withUserID: userId,
+                withCurrency: nil)
             self.rewardedVideoAd.delegate = self
         }
         self.rewardedVideoAd.load()

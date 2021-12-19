@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
+import com.facebook.ads.RewardData;
 import com.facebook.ads.RewardedVideoAd;
 import com.facebook.ads.RewardedVideoAdListener;
 
@@ -52,13 +53,19 @@ class FacebookRewardedVideoAdPlugin implements MethodChannel.MethodCallHandler,
 
     private boolean loadAd(HashMap args) {
         final String placementId = (String) args.get("id");
+        final String userId = (String) args.get("userId");
 
         if (rewardedVideoAd == null) {
             rewardedVideoAd = new RewardedVideoAd(context, placementId);
         }
         try {
+            final RewardData rewardData = new RewardData(userId, null);
             if (!rewardedVideoAd.isAdLoaded()) {
-                RewardedVideoAd.RewardedVideoLoadAdConfig loadAdConfig = rewardedVideoAd.buildLoadAdConfig().withAdListener(this).build();
+                RewardedVideoAd.RewardedVideoLoadAdConfig loadAdConfig = rewardedVideoAd
+                        .buildLoadAdConfig()
+                        .withRewardData(rewardData)
+                        .withAdListener(this)
+                        .build();
 
                 rewardedVideoAd.loadAd(loadAdConfig);
             }

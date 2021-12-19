@@ -47,11 +47,13 @@ class FacebookRewardedVideoAd {
   /// ```
   static Future<bool?> loadRewardedVideoAd({
     String placementId = "YOUR_PLACEMENT_ID",
+    String? userId,
     Function(RewardedVideoAdResult, dynamic)? listener,
   }) async {
     try {
       final args = <String, dynamic>{
         "id": placementId,
+        "userId": userId,
       };
 
       final result = await _channel.invokeMethod(
