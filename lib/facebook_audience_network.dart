@@ -27,7 +27,7 @@ class FacebookAudienceNetwork {
 
   /// Initializes the Facebook Audience Network. [testingId] can be used to
   /// obtain test Ads. [testMode] can be used to obtain test Ads as well,
-  /// it only works on iOS.
+  /// it is more useful on iOS where testingId keeps changing.
   ///
   /// [testingId] can be obtained by running the app once without the testingId.
   /// Check the log to obtain the [testingId] for your device.

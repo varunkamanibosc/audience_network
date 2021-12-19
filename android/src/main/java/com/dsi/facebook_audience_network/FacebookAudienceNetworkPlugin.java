@@ -64,11 +64,15 @@ public class FacebookAudienceNetworkPlugin implements FlutterPlugin, MethodCallH
 
     private boolean init(HashMap initValues) {
         final String testingId = (String) initValues.get("testingId");
+        final Boolean testMode = (Boolean) initValues.get("testMode");
 
         AudienceNetworkAds.initialize(_activity.getApplicationContext());
 
         if (testingId != null) {
             AdSettings.addTestDevice(testingId);
+        }
+        if (testMode) {
+            AdSettings.setTestMode(true);
         }
         return true;
     }
