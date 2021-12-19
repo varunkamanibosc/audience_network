@@ -21,7 +21,7 @@
 For testing purposes you need to obtain the hashed ID of your testing device. To obtain the hashed ID: 
 
 1. Call `AudienceNetwork.init()` during app initialization.
-2. Place the `FacebookBannerAd` widget in your app.
+2. Place the `BannerAd` widget in your app.
 3. Run the app.
 
 The hased id will be in printed to the logcat. Paste that onto the `testingId` parameter.
@@ -42,7 +42,7 @@ In Pod file, set the IOS deployment target version to 9.0
 ```dart
 Container(
   alignment: Alignment(0.5, 1),
-  child: FacebookBannerAd(
+  child: BannerAd(
     placementId: Platform.isAndroid ? "YOUR_ANDROID_PLACEMENT_ID" : "YOUR_IOS_PLACEMENT_ID",
     bannerSize: BannerSize.STANDARD,
     listener: (result, value) {
@@ -103,7 +103,7 @@ rewardedAd.load();
 ### 5. Show Native Ad:
 - NativeAdType NATIVE_AD_HORIZONTAL & NATIVE_AD_VERTICAL ad types are supported only in iOS. In Android use NATIVE_AD.
 ```dart
-FacebookNativeAd(
+NativeAd(
   placementId: "YOUR_PLACEMENT_ID",
   adType: NativeAdType.NATIVE_AD,
   width: double.infinity,
@@ -127,7 +127,7 @@ FacebookNativeAd(
 Use `NativeBannerAdSize` to choose the height for Native banner ads. `height` property is ignored for native banner ads.
 
 ```dart
-FacebookNativeAd(
+NativeAd(
   placementId: "YOUR_PLACEMENT_ID",
   adType: NativeAdType.NATIVE_BANNER_AD,
   bannerAdSize: NativeBannerAdSize.HEIGHT_100,
@@ -144,7 +144,7 @@ FacebookNativeAd(
 ),
 ```
 ---
-**Check out the [example](https://github.com/dreamsoftin/facebook_audience_network/tree/master/example) for complete implementation.**
+**Check out the [example](https://github.com/lslv1243/facebook_audience_network/tree/master/example) for complete implementation.**
 
 iOS wrapper code contribution by **lolqplay team from birdgang**
 
