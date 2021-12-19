@@ -1,6 +1,7 @@
 ## 0.0.3
 
 - Fix CHANGELOG
+- Mention it is a fork on README
 
 ## 0.0.2
 

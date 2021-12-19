@@ -1,7 +1,11 @@
 # audience_network
-![Pub](https://img.shields.io/pub/v/facebook_audience_network.svg) ![GitHub](https://img.shields.io/github/license/dreamsoftin/facebook_audience_network.svg)<a href="https://github.com/Solido/awesome-flutter">
-   <img alt="Awesome Flutter" src="https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square" />
-</a>
+![Pub](https://img.shields.io/pub/v/audience_network.svg) ![GitHub](https://img.shields.io/github/license/dreamsoftin/facebook_audience_network.svg)
+
+Forked from https://pub.dev/packages/facebook_audience_network
+- Added support for multiple Interstitial and Rewarded Ads
+- Added support for Rewarded Ads on iOS
+
+---
 
 [Facebook Audience Network](https://developers.facebook.com/docs/audience-network) plugin for Flutter applications (Android & iOS).
 
