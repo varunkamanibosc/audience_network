@@ -194,7 +194,7 @@ class AdsPageState extends State<AdsPage> {
 
   _showBannerAd() {
     setState(() {
-      _currentAd = FacebookBannerAd(
+      _currentAd = BannerAd(
         // placementId: "YOUR_PLACEMENT_ID",
         placementId:
             "IMG_16_9_APP_INSTALL#2312433698835503_2964944860251047", //testid
@@ -213,7 +213,7 @@ class AdsPageState extends State<AdsPage> {
   }
 
   Widget _nativeBannerAd() {
-    return FacebookNativeAd(
+    return NativeAd(
       // placementId: "YOUR_PLACEMENT_ID",
       placementId: "IMG_16_9_APP_INSTALL#2312433698835503_2964953543583512",
       adType: NativeAdType.NATIVE_BANNER_AD,
@@ -238,7 +238,7 @@ class AdsPageState extends State<AdsPage> {
   }
 
   Widget _nativeAd() {
-    return FacebookNativeAd(
+    return NativeAd(
       placementId: "IMG_16_9_APP_INSTALL#2312433698835503_2964952163583650",
       adType: NativeAdType.NATIVE_AD_VERTICAL,
       width: double.infinity,

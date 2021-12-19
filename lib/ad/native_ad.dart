@@ -50,7 +50,7 @@ class NativeBannerAdSize {
   const NativeBannerAdSize({this.height});
 }
 
-class FacebookNativeAd extends StatefulWidget {
+class NativeAd extends StatefulWidget {
   /// Replace the default one with your placement ID for the release build.
   final String placementId;
 
@@ -108,7 +108,7 @@ class FacebookNativeAd extends StatefulWidget {
 
   /// This widget can be used to display customizable native ads and native
   /// banner ads.
-  FacebookNativeAd({
+  NativeAd({
     Key? key,
     this.placementId = "YOUR_PLACEMENT_ID",
     this.listener,
@@ -130,10 +130,10 @@ class FacebookNativeAd extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _FacebookNativeAdState createState() => _FacebookNativeAdState();
+  _NativeAdState createState() => _NativeAdState();
 }
 
-class _FacebookNativeAdState extends State<FacebookNativeAd>
+class _NativeAdState extends State<NativeAd>
     with AutomaticKeepAliveClientMixin {
   final double containerHeight = Platform.isAndroid ? 1.0 : 0.1;
   bool isAdReady = false;

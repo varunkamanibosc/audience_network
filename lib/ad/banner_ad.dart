@@ -38,7 +38,7 @@ enum BannerAdResult {
   LOGGING_IMPRESSION,
 }
 
-class FacebookBannerAd extends StatefulWidget {
+class BannerAd extends StatefulWidget {
   final Key? key;
 
   /// Replace the default one with your placement ID for the release build.
@@ -68,7 +68,7 @@ class FacebookBannerAd extends StatefulWidget {
   ///   'error\_message': "No internet connection",
   /// }
   /// ```
-  FacebookBannerAd({
+  BannerAd({
     this.key,
     this.placementId = "YOUR_PLACEMENT_ID",
     this.bannerSize = BannerSize.STANDARD,
@@ -77,10 +77,10 @@ class FacebookBannerAd extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _FacebookBannerAdState createState() => _FacebookBannerAdState();
+  _BannerAdState createState() => _BannerAdState();
 }
 
-class _FacebookBannerAdState extends State<FacebookBannerAd>
+class _BannerAdState extends State<BannerAd>
     with AutomaticKeepAliveClientMixin {
   double containerHeight = 0.5;
 
