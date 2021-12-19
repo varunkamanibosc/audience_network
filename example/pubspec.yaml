@@ -1,5 +1,5 @@
-name: facebook_audience_network_example
-description: Demonstrates how to use the facebook_audience_network plugin.
+name: audience_network_example
+description: Demonstrates how to use the audience_network plugin.
 publish_to: 'none'
 
 environment:

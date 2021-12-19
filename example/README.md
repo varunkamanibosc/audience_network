@@ -1,6 +1,6 @@
-# facebook_audience_network_example
+# audience_network_example
 
-Demonstrates how to use the facebook_audience_network plugin.
+Demonstrates how to use the audience_network plugin.
 
 | Banner Ad | Native Banner Ad | Native Ad |
 | - | - | - |

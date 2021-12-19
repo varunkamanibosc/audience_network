@@ -1,6 +1,6 @@
 //
 //  FacebookAudienceNetworkRewardedAd.swift
-//  facebook_audience_network
+//  audience_network
 //
 //  Created by Leonardo da Silva on 18/12/21.
 //

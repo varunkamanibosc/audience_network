@@ -1,4 +1,4 @@
-package com.dsi.facebook_audience_network;
+package com.dsi.audience_network;
 
 import android.content.Context;
 import android.os.Handler;

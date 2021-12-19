@@ -1,4 +1,4 @@
-package com.dsi.facebook_audience_network;
+package com.dsi.audience_network;
 
 
 import android.content.Context;
@@ -10,7 +10,6 @@ import com.facebook.ads.AdError;
 import com.facebook.ads.CacheFlag;
 import com.facebook.ads.InterstitialAd;
 import com.facebook.ads.InterstitialAdListener;
-import com.facebook.ads.RewardedVideoAd;
 
 import java.util.HashMap;
 

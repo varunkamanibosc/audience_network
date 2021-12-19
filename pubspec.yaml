@@ -33,12 +33,12 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.dsi.facebook_audience_network
+        package: com.dsi.audience_network
         pluginClass: FacebookAudienceNetworkPlugin
       ios:
         pluginClass: FacebookAudienceNetworkPlugin
   # plugin:
-  #   androidPackage: com.dsi.facebook_audience_network
+  #   androidPackage: com.dsi.audience_network
   #   pluginClass: FacebookAudienceNetworkPlugin
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
