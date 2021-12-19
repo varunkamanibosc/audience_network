@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:facebook_audience_network/constants.dart';
+import '../constants.dart';
 
 /// Defines the size of BannerAds. Only three ad sizes are supported. The width
 /// is flexible with 320px as minimum.

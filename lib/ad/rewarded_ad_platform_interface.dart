@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 
-import 'package:facebook_audience_network/constants.dart';
+import '../constants.dart';
 
 enum RewardedAdPlatformInterfaceResult {
   /// Rewarded video error.

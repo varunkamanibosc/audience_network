@@ -17,7 +17,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  facebook_audience_network:
+  audience_network:
     path: ../
 
 
