@@ -15,20 +15,29 @@ class FANPluginFactory: NSObject {
         channel.setMethodCallHandler { (_ call : FlutterMethodCall, result : @escaping FlutterResult) in
             switch call.method{
             case "init":
-                let args = call.arguments as! Dictionary<String,AnyObject>
-                if let testingId = args["testingId"] as? String {
+                FBAudienceNetworkAds.initialize(with: nil) { results in
+                    if !results.isSuccess {
+                        print("FANPluginFactory > init > failed")
+                        result(false)
+                        return
+                    }
                     
-                    FBAdSettings.addTestDevice(testingId)
-                } else {
-                    print("test hash: \(FBAdSettings.testDeviceHash())")
+                    let args = call.arguments as! Dictionary<String,AnyObject>
+                    if let testingId = args["testingId"] as? String {
+                        FBAdSettings.addTestDevice(testingId)
+                    } else {
+                        print("test hash: \(FBAdSettings.testDeviceHash())")
+                    }
+                    
+                    if #available(iOS 14.0, *) {
+                        let iOSAdvertiserTrackingEnabled = (args["iOSAdvertiserTrackingEnabled"] as! NSString).boolValue
+                        print("FANPluginFactory > iOSAdvertiserTrackingEnabled: " + String(iOSAdvertiserTrackingEnabled))
+                        FBAdSettings.setAdvertiserTrackingEnabled(iOSAdvertiserTrackingEnabled)
+                    }
+                    
+                    print("FANPluginFactory > init")
+                    result(true)
                 }
-                if #available(iOS 14.0, *) {
-                    let iOSAdvertiserTrackingEnabled = (args["iOSAdvertiserTrackingEnabled"] as! NSString).boolValue
-                    print("FANPluginFactory > iOSAdvertiserTrackingEnabled: " + String(iOSAdvertiserTrackingEnabled))
-                    FBAdSettings.setAdvertiserTrackingEnabled(iOSAdvertiserTrackingEnabled)
-                }
-                print("FANPluginFactory > init")
-                result(true)
             default:
                 result(FlutterMethodNotImplemented)
             }
