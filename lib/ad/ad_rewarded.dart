@@ -53,9 +53,6 @@ class FacebookRewardedVideoAd {
       final args = <String, dynamic>{
         "id": placementId,
       };
-      
-      if(Platform.isIOS)
-        return false;
 
       final result = await _channel.invokeMethod(
         LOAD_REWARDED_VIDEO_METHOD,

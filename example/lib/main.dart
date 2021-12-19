@@ -56,12 +56,12 @@ class AdsPageState extends State<AdsPage> {
     /// please add your own device testingId
     /// (testingId will print in console if you don't provide  )
     FacebookAudienceNetwork.init(
-      testingId: "a77955ee-3304-4635-be65-81029b0f5201",
-      iOSAdvertiserTrackingEnabled: true,
-    );
-
-    _loadInterstitialAd();
-    _loadRewardedVideoAd();
+      testingId: "b602d594afd2b0b327e07a06f36ca6a7e42546d0",
+      // iOSAdvertiserTrackingEnabled: true,
+    ).then((_) {
+      _loadInterstitialAd();
+      _loadRewardedVideoAd();
+    });
   }
 
   void _loadInterstitialAd() {
