@@ -26,15 +26,20 @@ class FacebookAudienceNetwork {
   static const _channel = const MethodChannel(MAIN_CHANNEL);
 
   /// Initializes the Facebook Audience Network. [testingId] can be used to
-  /// obtain test Ads.
+  /// obtain test Ads. [testMode] can be used to obtain test Ads as well,
+  /// it only works on iOS.
   ///
   /// [testingId] can be obtained by running the app once without the testingId.
   /// Check the log to obtain the [testingId] for your device.
-  static Future<bool?> init(
-      {String? testingId, bool iOSAdvertiserTrackingEnabled = false}) async {
-    Map<String, String?> initValues = {
+  static Future<bool?> init({
+    String? testingId,
+    bool testMode = false,
+    bool iOSAdvertiserTrackingEnabled = false,
+  }) async {
+    Map<String, dynamic> initValues = {
       "testingId": testingId,
-      "iOSAdvertiserTrackingEnabled": iOSAdvertiserTrackingEnabled.toString(),
+      "iOSAdvertiserTrackingEnabled": iOSAdvertiserTrackingEnabled,
+      "testMode": testMode,
     };
 
     try {

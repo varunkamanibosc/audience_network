@@ -22,15 +22,24 @@ class FANPluginFactory: NSObject {
                         return
                     }
                     
-                    let args = call.arguments as! Dictionary<String,AnyObject>
-                    if let testingId = args["testingId"] as? String {
+                    let args = call.arguments as! Dictionary<String, Any>
+                    
+                    let testingId = args["testingId"] as? String
+                    let testMode = args["testMode"] as! Bool
+                    let deviceHash = FBAdSettings.testDeviceHash()
+                    
+                    if let testingId = testingId {
                         FBAdSettings.addTestDevice(testingId)
-                    } else {
-                        print("test hash: \(FBAdSettings.testDeviceHash())")
+                    }
+                    if testMode && testingId != deviceHash {
+                        FBAdSettings.addTestDevice(deviceHash)
+                    }
+                    if testingId == nil && !testMode {
+                        print("test hash: \(deviceHash)")
                     }
                     
                     if #available(iOS 14.0, *) {
-                        let iOSAdvertiserTrackingEnabled = (args["iOSAdvertiserTrackingEnabled"] as! NSString).boolValue
+                        let iOSAdvertiserTrackingEnabled = args["iOSAdvertiserTrackingEnabled"] as! Bool
                         print("FANPluginFactory > iOSAdvertiserTrackingEnabled: " + String(iOSAdvertiserTrackingEnabled))
                         FBAdSettings.setAdvertiserTrackingEnabled(iOSAdvertiserTrackingEnabled)
                     }
