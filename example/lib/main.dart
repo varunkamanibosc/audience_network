@@ -53,11 +53,12 @@ class AdsPageState extends State<AdsPage> {
   void initState() {
     super.initState();
 
-    /// please add your own device testingId
-    /// (testingId will print in console if you don't provide  )
+    // testingId is useful when you want to test if your implementation works in production
+    // without getting real ads, I believe it does not work properly on iOS,
+    // if you want to get your testingId, don't set any testingId and don't set testMode
     FacebookAudienceNetwork.init(
-      testingId: "b602d594afd2b0b327e07a06f36ca6a7e42546d0",
-      // iOSAdvertiserTrackingEnabled: true,
+      // testingId: "b602d594afd2b0b327e07a06f36ca6a7e42546d0",
+      testMode: true,
     ).then((_) {
       _loadInterstitialAd();
       _loadRewardedVideoAd();
