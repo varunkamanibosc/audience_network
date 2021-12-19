@@ -77,10 +77,10 @@ class RewardedAdPlatformInterface {
   /// Example:
   ///
   /// ```dart
-  /// FacebookRewardedVideoAd.loadRewardedVideoAd(
+  /// RewardedAdPlatformInterface.loadRewardedVideoAd(
   ///   listener: (result, value) {
   ///     if(result == RewardedVideoAdResult.LOADED)
-  ///       FacebookRewardedVideoAd.showRewardedVideoAd();
+  ///       RewardedAdPlatformInterface.showRewardedVideoAd();
   ///   },
   /// );
   /// ```

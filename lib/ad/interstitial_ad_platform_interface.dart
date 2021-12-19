@@ -75,10 +75,10 @@ class InterstitialAdPlatformInterface {
   /// Example:
   ///
   /// ```dart
-  /// FacebookInterstitialAd.loadInterstitialAd(
+  /// InterstitialAdPlatformInterface.loadInterstitialAd(
   ///   listener: (result, value) {
   ///     if (result == InterstitialAdResult.LOADED)
-  ///       FacebookInterstitialAd.showInterstitialAd(delay: 5000);
+  ///       InterstitialAdPlatformInterface.showInterstitialAd(delay: 5000);
   ///   },
   /// );
   /// ```
