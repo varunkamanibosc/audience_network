@@ -57,16 +57,14 @@ public class FacebookAudienceNetworkPlugin implements FlutterPlugin, MethodCallH
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
 
         if (call.method.equals(FacebookConstants.INIT_METHOD))
-            result.success(init((HashMap) call.arguments));
+            init((HashMap) call.arguments, result);
         else
             result.notImplemented();
     }
 
-    private boolean init(HashMap initValues) {
+    private void init(HashMap initValues, final MethodChannel.Result result) {
         final String testingId = (String) initValues.get("testingId");
         final Boolean testMode = (Boolean) initValues.get("testMode");
-
-        AudienceNetworkAds.initialize(_activity.getApplicationContext());
 
         if (testingId != null) {
             AdSettings.addTestDevice(testingId);
@@ -74,7 +72,15 @@ public class FacebookAudienceNetworkPlugin implements FlutterPlugin, MethodCallH
         if (testMode) {
             AdSettings.setTestMode(true);
         }
-        return true;
+        AudienceNetworkAds
+                .buildInitSettings(_activity.getApplicationContext())
+                .withInitListener(new  AudienceNetworkAds.InitListener() {
+                    @Override
+                    public void onInitialized(AudienceNetworkAds.InitResult initResult) {
+                        result.success(initResult.isSuccess());
+                    }
+                })
+                .initialize();
     }
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
