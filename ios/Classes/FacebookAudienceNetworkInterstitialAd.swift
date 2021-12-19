@@ -152,11 +152,14 @@ class FacebookAudienceNetworkInterstitialAdPlugin: NSObject, FBInterstitialAdDel
         print("InterstitialAdView > interstitialAd failed")
         print(error.localizedDescription)
         
+        let errorDetails = FacebookAdErrorDetails(fromSDKError: error)
         let placement_id: String = interstitialAd.placementID
         let invalidated: Bool = interstitialAd.isAdValid
         let arg: [String: Any] = [
             FANConstant.PLACEMENT_ID_ARG: placement_id,
             FANConstant.INVALIDATED_ARG: invalidated,
+            FANConstant.ERROR_CODE_ARG: errorDetails?.code as Any,
+            FANConstant.ERROR_MESSAGE_ARG: errorDetails?.message as Any,
         ]
         self.channel.invokeMethod(FANConstant.ERROR_METHOD, arguments: arg)
     }
