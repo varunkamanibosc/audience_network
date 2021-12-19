@@ -43,5 +43,9 @@
 	<false/>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_dartobservatory._tcp</string>
+    </array>
 </dict>
 </plist>
