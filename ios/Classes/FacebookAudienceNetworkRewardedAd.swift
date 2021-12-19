@@ -11,7 +11,8 @@ import FBAudienceNetwork
 
 class FacebookAudienceNetworkRewardedAdPlugin: NSObject, FBRewardedVideoAdDelegate {
     let channel: FlutterMethodChannel
-    var rewardedVideoAd: FBRewardedVideoAd!
+    private var adsById: [Int: FBRewardedVideoAd] = [:]
+    private var idsByAd: [FBRewardedVideoAd: Int] = [:]
     
     init(_channel: FlutterMethodChannel) {
         print("FacebookAudienceNetworkRewardedAdPluginPlugin > init")
@@ -30,7 +31,7 @@ class FacebookAudienceNetworkRewardedAdPlugin: NSObject, FBRewardedVideoAdDelega
                 result(self.showAd(call))
             case "destroyRewardedAd":
                 print("FacebookAudienceNetworkRewardedAdPlugin> destroyRewardedAd")
-                result(self.destroyAd())
+                result(self.destroyAd(call))
             default: result(FlutterMethodNotImplemented)
             }
         }
@@ -39,28 +40,41 @@ class FacebookAudienceNetworkRewardedAdPlugin: NSObject, FBRewardedVideoAdDelega
     }
     
     func loadAd(_ call: FlutterMethodCall) -> Bool {
-        if nil == self.rewardedVideoAd || !self.rewardedVideoAd.isAdValid {
+        let args: NSDictionary = call.arguments as! NSDictionary
+        let id = args["id"] as! Int
+        let placementId = args["placementId"] as! String
+        let userId = args["userId"] as? String
+        
+        var rewardedVideoAd: FBRewardedVideoAd! = adsById[id]
+        
+        if rewardedVideoAd == nil || !rewardedVideoAd.isAdValid {
             print("FacebookAudienceNetworkRewardedAdPlugin > loadAd > create")
-            let args: NSDictionary = call.arguments as! NSDictionary
-            let placementId = args["placementId"] as! String
-            let userId = args["userId"] as? String
-            self.rewardedVideoAd = FBRewardedVideoAd(
+            
+            rewardedVideoAd = FBRewardedVideoAd(
                 placementID: placementId,
                 withUserID: userId,
                 withCurrency: nil)
-            self.rewardedVideoAd.delegate = self
+            rewardedVideoAd.delegate = self
+            adsById[id] = rewardedVideoAd
+            idsByAd[rewardedVideoAd] = id
         }
-        self.rewardedVideoAd.load()
+        
+        rewardedVideoAd.load()
+        
         return true
     }
     
     func showAd(_ call: FlutterMethodCall) -> Bool {
-        if !self.rewardedVideoAd.isAdValid {
+        let args: NSDictionary = call.arguments as! NSDictionary
+        let id: Int = args["id"] as! Int
+        let delay: Int = args["delay"] as! Int
+        
+        let rewardedVideoAd = adsById[id]!
+        
+        if !rewardedVideoAd.isAdValid {
             print("FacebookAudienceNetworkRewardedAdPlugin > showAd > not AdValid")
             return false
         }
-        let args: NSDictionary = call.arguments as! NSDictionary
-        let delay: Int = args["delay"] as! Int
         
         print("@@@ delay %d", delay)
         
@@ -81,24 +95,31 @@ class FacebookAudienceNetworkRewardedAdPlugin: NSObject, FBRewardedVideoAdDelega
         return true
     }
     
-    func destroyAd() -> Bool {
-        if nil == self.rewardedVideoAd {
-            return false
-        } else {
+    func destroyAd(_ call: FlutterMethodCall) -> Bool {
+        let args: NSDictionary = call.arguments as! NSDictionary
+        let id: Int = args["id"] as! Int
+        
+        let rewardedVideoAd = adsById[id]
+        
+        if let rewardedVideoAd = rewardedVideoAd {
             rewardedVideoAd.delegate = nil
-            rewardedVideoAd = nil
+            adsById.removeValue(forKey: id)
+            idsByAd.removeValue(forKey: rewardedVideoAd)
+            return true
         }
-        return true
+        return false
     }
     
     func rewardedVideoAd(_ rewardedVideoAd: FBRewardedVideoAd, didFailWithError error: Error) {
         print("RewardedAdView > rewardedAd failed")
         print(error.localizedDescription)
         
+        let id = idsByAd[rewardedVideoAd]!
         let errorDetails = FacebookAdErrorDetails(fromSDKError: error)
         let placement_id: String = rewardedVideoAd.placementID
         let invalidated: Bool = rewardedVideoAd.isAdValid
         let arg: [String: Any] = [
+            FANConstant.ID_ARG: id,
             FANConstant.PLACEMENT_ID_ARG: placement_id,
             FANConstant.INVALIDATED_ARG: invalidated,
             FANConstant.ERROR_CODE_ARG: errorDetails?.code as Any,
@@ -110,9 +131,11 @@ class FacebookAudienceNetworkRewardedAdPlugin: NSObject, FBRewardedVideoAdDelega
     func rewardedVideoAdDidLoad(_ rewardedVideoAd: FBRewardedVideoAd) {
         print("RewardedAdView > rewardedAdDidLoad")
         
+        let id = idsByAd[rewardedVideoAd]!
         let placement_id: String = rewardedVideoAd.placementID
         let invalidated: Bool = rewardedVideoAd.isAdValid
         let arg: [String: Any] = [
+            FANConstant.ID_ARG: id,
             FANConstant.PLACEMENT_ID_ARG: placement_id,
             FANConstant.INVALIDATED_ARG: invalidated,
         ]
@@ -122,9 +145,11 @@ class FacebookAudienceNetworkRewardedAdPlugin: NSObject, FBRewardedVideoAdDelega
     func rewardedVideoAdDidClick(_ rewardedVideoAd: FBRewardedVideoAd) {
         print("RewardedAdView > rewardedAdDidClick")
         
+        let id = idsByAd[rewardedVideoAd]!
         let placement_id: String = rewardedVideoAd.placementID
         let invalidated: Bool = rewardedVideoAd.isAdValid
         let arg: [String: Any] = [
+            FANConstant.ID_ARG: id,
             FANConstant.PLACEMENT_ID_ARG: placement_id,
             FANConstant.INVALIDATED_ARG: invalidated,
         ]
@@ -134,9 +159,11 @@ class FacebookAudienceNetworkRewardedAdPlugin: NSObject, FBRewardedVideoAdDelega
     func rewardedVideoAdWillLogImpression(_ rewardedVideoAd: FBRewardedVideoAd) {
         print("RewardedAdView > rewardedAdWillLogImpression")
         
+        let id = idsByAd[rewardedVideoAd]!
         let placement_id: String = rewardedVideoAd.placementID
         let invalidated: Bool = rewardedVideoAd.isAdValid
         let arg: [String: Any] = [
+            FANConstant.ID_ARG: id,
             FANConstant.PLACEMENT_ID_ARG: placement_id,
             FANConstant.INVALIDATED_ARG: invalidated,
         ]
@@ -145,9 +172,12 @@ class FacebookAudienceNetworkRewardedAdPlugin: NSObject, FBRewardedVideoAdDelega
     
     func rewardedVideoAdVideoComplete(_ rewardedVideoAd: FBRewardedVideoAd) {
         print("RewardedAdView > rewardedAdComplete")
+        
+        let id = idsByAd[rewardedVideoAd]!
         let placement_id: String = rewardedVideoAd.placementID
         let invalidated: Bool = rewardedVideoAd.isAdValid
         let arg: [String: Any] = [
+            FANConstant.ID_ARG: id,
             FANConstant.PLACEMENT_ID_ARG: placement_id,
             FANConstant.INVALIDATED_ARG: invalidated,
         ]
@@ -156,9 +186,12 @@ class FacebookAudienceNetworkRewardedAdPlugin: NSObject, FBRewardedVideoAdDelega
     
     func rewardedVideoAdDidClose(_ rewardedVideoAd: FBRewardedVideoAd) {
         print("RewardedAdView > rewardedAdDidClose")
+        
+        let id = idsByAd[rewardedVideoAd]!
         let placement_id: String = rewardedVideoAd.placementID
         let invalidated: Bool = rewardedVideoAd.isAdValid
         let arg: [String: Any] = [
+            FANConstant.ID_ARG: id,
             FANConstant.PLACEMENT_ID_ARG: placement_id,
             FANConstant.INVALIDATED_ARG: invalidated,
         ]

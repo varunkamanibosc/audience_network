@@ -16,6 +16,7 @@ struct FANConstant{
     static let REWARDED_VIDEO_COMPLETE_METHOD = "rewarded_complete"
     static let REWARDED_VIDEO_CLOSED_METHOD = "rewarded_closed"
     
+    static let ID_ARG = "id"
     static let PLACEMENT_ID_ARG = "placement_id";
     static let INVALIDATED_ARG = "invalidated";
     static let CODE_ARG = "code";
