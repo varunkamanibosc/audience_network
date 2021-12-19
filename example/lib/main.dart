@@ -40,6 +40,7 @@ class AdsPage extends StatefulWidget {
 class AdsPageState extends State<AdsPage> {
   bool _isInterstitialAdLoaded = false;
   bool _isRewardedAdLoaded = false;
+  InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
 
   /// All widget ads are stored in this variable. When a button is pressed, its
@@ -67,23 +68,24 @@ class AdsPageState extends State<AdsPage> {
   }
 
   void _loadInterstitialAd() {
-    FacebookInterstitialAd.loadInterstitialAd(
-      // placementId: "YOUR_PLACEMENT_ID",
-      placementId: "IMG_16_9_APP_INSTALL#2312433698835503_2650502525028617",
-      listener: (result, value) {
-        print(">> FAN > Interstitial Ad: $result --> $value");
-        if (result == InterstitialAdResult.LOADED)
-          _isInterstitialAdLoaded = true;
-
-        /// Once an Interstitial Ad has been dismissed and becomes invalidated,
-        /// load a fresh Ad by calling this function.
-        if (result == InterstitialAdResult.DISMISSED &&
-            value["invalidated"] == true) {
-          _isInterstitialAdLoaded = false;
-          _loadInterstitialAd();
-        }
+    final interstitialAd = InterstitialAd('YOUR_PLACEMENT_ID');
+    interstitialAd.listener = InterstitialAdListener(
+      onLoaded: () {
+        _isInterstitialAdLoaded = true;
+        print('interstitial ad loaded');
+      },
+      onError: (code, message) {
+        print('interstitial ad error\ncode = $code\nmessage = $message');
+      },
+      onDismissed: () {
+        // load next ad already
+        interstitialAd.destroy();
+        _isInterstitialAdLoaded = false;
+        _loadInterstitialAd();
       },
     );
+    interstitialAd.load();
+    _interstitialAd = interstitialAd;
   }
 
   void _loadRewardedVideoAd() {
@@ -97,7 +99,7 @@ class AdsPageState extends State<AdsPage> {
         print('rewarded ad error\ncode = $code\nmessage = $message');
       },
       onVideoClosed: () {
-        // already loads next ad on error
+        // load next ad already
         rewardedAd.destroy();
         _isRewardedAdLoaded = false;
         _loadRewardedVideoAd();
@@ -172,8 +174,10 @@ class AdsPageState extends State<AdsPage> {
   }
 
   _showInterstitialAd() {
-    if (_isInterstitialAdLoaded == true)
-      FacebookInterstitialAd.showInterstitialAd();
+    final interstitialAd = _interstitialAd;
+
+    if (interstitialAd != null && _isInterstitialAdLoaded == true)
+      interstitialAd.show();
     else
       print("Interstial Ad not yet loaded!");
   }

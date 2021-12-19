@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 
 import '../constants.dart';
 
-enum InterstitialAdResult {
+enum InterstitialAdPlatformInterfaceResult {
   /// Interstitial Ad displayed to the user
   DISPLAYED,
 
@@ -22,15 +22,16 @@ enum InterstitialAdResult {
   LOGGING_IMPRESSION,
 }
 
-class FacebookInterstitialAd {
-  static void Function(InterstitialAdResult, dynamic)? _listener;
+class InterstitialAdPlatformInterface {
+  static final _listeners =
+      <int, void Function(InterstitialAdPlatformInterfaceResult, dynamic)>{};
 
   static const _channel = const MethodChannel(INTERSTITIAL_AD_CHANNEL);
 
   /// Loads an Interstitial Ad in background. Replace the default [placementId]
   /// with the one which you obtain by signing-up for Facebook Audience Network.
   ///
-  /// [listener] passes [InterstitialAdResult] and information associated with
+  /// [listener] passes [InterstitialAdPlatformInterfaceResult] and information associated with
   /// the result to the implemented callback.
   ///
   /// Information will generally be of type Map with details such as:
@@ -43,9 +44,10 @@ class FacebookInterstitialAd {
   ///   'error\_message': "No internet connection",
   /// }
   /// ```
-  static Future<bool?> loadInterstitialAd({
+  static Future<bool?> loadInterstitialAd(
+    int id, {
     String placementId = "YOUR_PLACEMENT_ID",
-    Function(InterstitialAdResult, dynamic)? listener,
+    required Function(InterstitialAdPlatformInterfaceResult, dynamic) listener,
   }) async {
     try {
       final args = <String, dynamic>{
@@ -57,7 +59,7 @@ class FacebookInterstitialAd {
         args,
       );
       _channel.setMethodCallHandler(_interstitialMethodCall);
-      _listener = listener;
+      _listeners[id] = listener;
 
       return result;
     } on PlatformException {
@@ -79,9 +81,10 @@ class FacebookInterstitialAd {
   ///   },
   /// );
   /// ```
-  static Future<bool?> showInterstitialAd({int? delay = 0}) async {
+  static Future<bool?> showInterstitialAd(int id, {int? delay = 0}) async {
     try {
       final args = <String, dynamic>{
+        "id": id,
         "delay": delay,
       };
 
@@ -97,42 +100,51 @@ class FacebookInterstitialAd {
   }
 
   /// Removes the Ad.
-  static Future<bool?> destroyInterstitialAd() async {
+  static Future<bool?> destroyInterstitialAd(int id) async {
     try {
-      final result = await _channel.invokeMethod(DESTROY_INTERSTITIAL_METHOD);
+      final args = <String, dynamic>{
+        "id": id,
+      };
+
+      final result = await _channel.invokeMethod(
+        DESTROY_INTERSTITIAL_METHOD,
+        args,
+      );
+      _listeners.remove(id);
       return result;
     } on PlatformException {
       return false;
     }
   }
 
-  static Future<dynamic> _interstitialMethodCall(MethodCall call) {
+  static Future<dynamic> _interstitialMethodCall(MethodCall call) async {
+    final id = call.arguments['id'];
+    final listener = _listeners[id];
+    assert(listener != null);
+    if (listener == null) return;
+
     switch (call.method) {
       case DISPLAYED_METHOD:
-        if (_listener != null)
-          _listener!(InterstitialAdResult.DISPLAYED, call.arguments);
+        listener(
+            InterstitialAdPlatformInterfaceResult.DISPLAYED, call.arguments);
         break;
       case DISMISSED_METHOD:
-        if (_listener != null)
-          _listener!(InterstitialAdResult.DISMISSED, call.arguments);
+        listener(
+            InterstitialAdPlatformInterfaceResult.DISMISSED, call.arguments);
         break;
       case ERROR_METHOD:
-        if (_listener != null)
-          _listener!(InterstitialAdResult.ERROR, call.arguments);
+        listener(InterstitialAdPlatformInterfaceResult.ERROR, call.arguments);
         break;
       case LOADED_METHOD:
-        if (_listener != null)
-          _listener!(InterstitialAdResult.LOADED, call.arguments);
+        listener(InterstitialAdPlatformInterfaceResult.LOADED, call.arguments);
         break;
       case CLICKED_METHOD:
-        if (_listener != null)
-          _listener!(InterstitialAdResult.CLICKED, call.arguments);
+        listener(InterstitialAdPlatformInterfaceResult.CLICKED, call.arguments);
         break;
       case LOGGING_IMPRESSION_METHOD:
-        if (_listener != null)
-          _listener!(InterstitialAdResult.LOGGING_IMPRESSION, call.arguments);
+        listener(InterstitialAdPlatformInterfaceResult.LOGGING_IMPRESSION,
+            call.arguments);
         break;
     }
-    return Future.value(true);
   }
 }

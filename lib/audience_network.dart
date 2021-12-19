@@ -8,11 +8,10 @@ library audience_network;
 
 import 'package:flutter/services.dart';
 
-import 'ad/ad_interstitial.dart';
 import 'constants.dart';
 
 export 'ad/ad_banner.dart';
-export 'ad/ad_interstitial.dart';
+export 'ad/interstitial_ad.dart';
 export 'ad/ad_native.dart';
 export 'ad/rewarded_ad.dart';
 
@@ -47,54 +46,5 @@ class AudienceNetwork {
     } on PlatformException {
       return false;
     }
-  }
-
-  /// Loads an Interstitial Ad in background. Replace the default [placementId]
-  /// with the one which you obtain by signing-up for Facebook Audience Network.
-  ///
-  /// [listener] passes [InterstitialAdResult] and information associated with
-  /// the result to the implemented callback.
-  ///
-  /// Information will generally be of type Map with details such as:
-  ///
-  /// ```dart
-  /// {
-  ///   'placement_id': "YOUR_PLACEMENT_ID",
-  ///   'invalidated': false,
-  ///   'error_code': 2,
-  ///   'error_message': "No internet connection",
-  /// }
-  /// ```
-  static Future<bool?> loadInterstitialAd({
-    String placementId = "YOUR_PLACEMENT_ID",
-    Function(InterstitialAdResult, dynamic)? listener,
-  }) async {
-    return await FacebookInterstitialAd.loadInterstitialAd(
-      placementId: placementId,
-      listener: listener,
-    );
-  }
-
-  /// Shows an Interstitial Ad after it has been loaded. (This needs to be called
-  /// only after calling [loadInterstitialAd] function). [delay] is in
-  /// milliseconds.
-  ///
-  /// Example:
-  ///
-  /// ```dart
-  /// AudienceNetwork.loadInterstitialAd(
-  ///   listener: (result, value) {
-  ///     if (result == InterstitialAdResult.LOADED)
-  ///       AudienceNetwork.showInterstitialAd(delay: 5000);
-  ///   },
-  /// );
-  /// ```
-  static Future<bool?> showInterstitialAd({int? delay}) async {
-    return await FacebookInterstitialAd.showInterstitialAd(delay: delay);
-  }
-
-  /// Removes the Ad.
-  static Future<bool?> destroyInterstitialAd() async {
-    return await FacebookInterstitialAd.destroyInterstitialAd();
   }
 }
