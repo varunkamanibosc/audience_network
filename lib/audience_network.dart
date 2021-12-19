@@ -10,9 +10,9 @@ import 'package:flutter/services.dart';
 
 import 'constants.dart';
 
-export 'ad/ad_banner.dart';
+export 'ad/banner_ad.dart';
+export 'ad/native_ad.dart';
 export 'ad/interstitial_ad.dart';
-export 'ad/ad_native.dart';
 export 'ad/rewarded_ad.dart';
 
 /// All non-widget functions such as initialization, loading interstitial,
