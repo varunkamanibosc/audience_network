@@ -150,11 +150,10 @@ class FacebookRewardedVideoAdPlugin implements MethodChannel.MethodCallHandler {
 
         if (rewardedVideoAd == null)
             return false;
-        else {
-            rewardedVideoAd.destroy();
-            adsById.remove(id);
-            idsByAd.remove(rewardedVideoAd);
-        }
+
+        rewardedVideoAd.destroy();
+        adsById.remove(id);
+        idsByAd.remove(rewardedVideoAd);
         return true;
     }
 

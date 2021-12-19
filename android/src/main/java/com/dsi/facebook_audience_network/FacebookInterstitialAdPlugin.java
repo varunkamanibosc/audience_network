@@ -10,6 +10,7 @@ import com.facebook.ads.AdError;
 import com.facebook.ads.CacheFlag;
 import com.facebook.ads.InterstitialAd;
 import com.facebook.ads.InterstitialAdListener;
+import com.facebook.ads.RewardedVideoAd;
 
 import java.util.HashMap;
 
@@ -17,8 +18,8 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
 class FacebookInterstitialAdPlugin implements MethodChannel.MethodCallHandler, InterstitialAdListener {
-
-    private InterstitialAd interstitialAd = null;
+    private HashMap<Integer, InterstitialAd> adsById = new HashMap<>();
+    private HashMap<InterstitialAd, Integer> idsByAd = new HashMap<>();
 
     private Context context;
     private MethodChannel channel;
@@ -44,7 +45,7 @@ class FacebookInterstitialAdPlugin implements MethodChannel.MethodCallHandler, I
                 result.success(loadAd((HashMap) methodCall.arguments));
                 break;
             case FacebookConstants.DESTROY_INTERSTITIAL_METHOD:
-                result.success(destroyAd());
+                result.success(destroyAd((HashMap) methodCall.arguments));
                 break;
             default:
                 result.notImplemented();
@@ -52,10 +53,14 @@ class FacebookInterstitialAdPlugin implements MethodChannel.MethodCallHandler, I
     }
 
     private boolean loadAd(HashMap args) {
+        final int id = (int) args.get("id");
         final String placementId = (String) args.get("placementId");
 
+        InterstitialAd interstitialAd = adsById.get(id);
         if (interstitialAd == null) {
             interstitialAd = new InterstitialAd(context, placementId);
+            adsById.put(id, interstitialAd);
+            idsByAd.put(interstitialAd, id);
         }
         try {
             if (!interstitialAd.isAdLoaded()) {
@@ -72,7 +77,9 @@ class FacebookInterstitialAdPlugin implements MethodChannel.MethodCallHandler, I
     }
 
     private boolean showAd(HashMap args) {
+        final int id = (int) args.get("id");
         final int delay = (int) args.get("delay");
+        final InterstitialAd interstitialAd = adsById.get(id);
 
         if (interstitialAd == null || !interstitialAd.isAdLoaded())
             return false;
@@ -87,7 +94,6 @@ class FacebookInterstitialAdPlugin implements MethodChannel.MethodCallHandler, I
             _delayHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-
                     if (interstitialAd == null || !interstitialAd.isAdLoaded())
                         return;
 
@@ -102,19 +108,25 @@ class FacebookInterstitialAdPlugin implements MethodChannel.MethodCallHandler, I
         return true;
     }
 
-    private boolean destroyAd() {
+    private boolean destroyAd(HashMap args) {
+        final int id = (int) args.get("id");
+        final InterstitialAd interstitialAd = adsById.get(id);
+
         if (interstitialAd == null)
             return false;
-        else {
-            interstitialAd.destroy();
-            interstitialAd = null;
-        }
+
+        interstitialAd.destroy();
+        adsById.remove(id);
+        idsByAd.remove(interstitialAd);
         return true;
     }
 
     @Override
     public void onInterstitialDisplayed(Ad ad) {
+        final int id = idsByAd.get(ad);
+
         HashMap<String, Object> args = new HashMap<>();
+        args.put("id", id);
         args.put("placement_id", ad.getPlacementId());
         args.put("invalidated", ad.isAdInvalidated());
 
@@ -123,7 +135,10 @@ class FacebookInterstitialAdPlugin implements MethodChannel.MethodCallHandler, I
 
     @Override
     public void onInterstitialDismissed(Ad ad) {
+        final int id = idsByAd.get(ad);
+
         HashMap<String, Object> args = new HashMap<>();
+        args.put("id", id);
         args.put("placement_id", ad.getPlacementId());
         args.put("invalidated", ad.isAdInvalidated());
 
@@ -132,7 +147,10 @@ class FacebookInterstitialAdPlugin implements MethodChannel.MethodCallHandler, I
 
     @Override
     public void onError(Ad ad, AdError adError) {
+        final int id = idsByAd.get(ad);
+
         HashMap<String, Object> args = new HashMap<>();
+        args.put("id", id);
         args.put("placement_id", ad.getPlacementId());
         args.put("invalidated", ad.isAdInvalidated());
         args.put("error_code", adError.getErrorCode());
@@ -143,7 +161,10 @@ class FacebookInterstitialAdPlugin implements MethodChannel.MethodCallHandler, I
 
     @Override
     public void onAdLoaded(Ad ad) {
+        final int id = idsByAd.get(ad);
+
         HashMap<String, Object> args = new HashMap<>();
+        args.put("id", id);
         args.put("placement_id", ad.getPlacementId());
         args.put("invalidated", ad.isAdInvalidated());
 
@@ -152,7 +173,10 @@ class FacebookInterstitialAdPlugin implements MethodChannel.MethodCallHandler, I
 
     @Override
     public void onAdClicked(Ad ad) {
+        final int id = idsByAd.get(ad);
+
         HashMap<String, Object> args = new HashMap<>();
+        args.put("id", id);
         args.put("placement_id", ad.getPlacementId());
         args.put("invalidated", ad.isAdInvalidated());
 
@@ -161,7 +185,10 @@ class FacebookInterstitialAdPlugin implements MethodChannel.MethodCallHandler, I
 
     @Override
     public void onLoggingImpression(Ad ad) {
+        final int id = idsByAd.get(ad);
+
         HashMap<String, Object> args = new HashMap<>();
+        args.put("id", id);
         args.put("placement_id", ad.getPlacementId());
         args.put("invalidated", ad.isAdInvalidated());
 
