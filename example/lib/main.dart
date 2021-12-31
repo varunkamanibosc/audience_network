@@ -197,9 +197,11 @@ class AdsPageState extends State<AdsPage> {
       _currentAd = BannerAd(
         placementId: BannerAd.testPlacementId,
         bannerSize: BannerSize.STANDARD,
-        listener: (result, value) {
-          print("Banner Ad: $result -->  $value");
-        },
+        listener: BannerAdListener(
+          onError: (code, message) =>
+              print('banner ad error\ncode: $code\nmessage:$message'),
+          onLoaded: () => print('banner ad loaded'),
+        ),
       );
     });
   }
@@ -222,9 +224,12 @@ class AdsPageState extends State<AdsPage> {
       buttonColor: Colors.deepPurple,
       buttonTitleColor: Colors.white,
       buttonBorderColor: Colors.white,
-      listener: (result, value) {
-        print("Native Banner Ad: $result --> $value");
-      },
+      listener: NativeAdListener(
+        onError: (code, message) =>
+            print('native banner ad error\ncode: $code\nmessage:$message'),
+        onLoaded: () => print('native banner ad loaded'),
+        onMediaDownloaded: () => 'native banner ad media downloaded',
+      ),
     );
   }
 
@@ -236,7 +241,7 @@ class AdsPageState extends State<AdsPage> {
 
   Widget _nativeAd() {
     return NativeAd(
-      placementId: "IMG_16_9_APP_INSTALL#2312433698835503_2964952163583650",
+      placementId: NativeAd.testPlacementId,
       adType: NativeAdType.NATIVE_AD_VERTICAL,
       width: double.infinity,
       height: 300,
@@ -246,9 +251,12 @@ class AdsPageState extends State<AdsPage> {
       buttonColor: Colors.deepPurple,
       buttonTitleColor: Colors.white,
       buttonBorderColor: Colors.white,
-      listener: (result, value) {
-        print("Native Ad: $result --> $value");
-      },
+      listener: NativeAdListener(
+        onError: (code, message) =>
+            print('native ad error\ncode: $code\nmessage:$message'),
+        onLoaded: () => print('native ad loaded'),
+        onMediaDownloaded: () => 'native ad media downloaded',
+      ),
       keepExpandedWhileLoading: true,
       expandAnimationDuraion: 1000,
     );
