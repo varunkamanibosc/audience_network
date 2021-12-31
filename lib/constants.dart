@@ -26,5 +26,3 @@ const String REWARDED_VIDEO_COMPLETE_METHOD = "rewarded_complete";
 const String REWARDED_VIDEO_CLOSED_METHOD = "rewarded_closed";
 
 const String MEDIA_DOWNLOADED_METHOD = "media_downloaded";
-
-const String LOAD_SUCCESS_METHOD = "load_success";

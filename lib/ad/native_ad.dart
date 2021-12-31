@@ -17,21 +17,20 @@ enum NativeAdType {
   NATIVE_AD_VERTICAL,
 }
 
-enum NativeAdResult {
-  /// Native Ad error.
-  ERROR,
+class NativeAdListener {
+  final void Function(int code, String message)? onError;
+  final void Function()? onLoaded;
+  final void Function()? onClicked;
+  final void Function()? onLoggingImpression;
+  final void Function()? onMediaDownloaded;
 
-  /// Native Ad loaded successfully.
-  LOADED,
-
-  /// Native Ad clicked.
-  CLICKED,
-
-  /// Native Ad impression logged.
-  LOGGING_IMPRESSION,
-
-  /// Native Ad media loaded successfully.
-  MEDIA_DOWNLOADED,
+  NativeAdListener({
+    this.onError,
+    this.onLoaded,
+    this.onClicked,
+    this.onLoggingImpression,
+    this.onMediaDownloaded,
+  });
 }
 
 /// Defines the size of Native Banner Ads. Only three ad sizes are supported.
@@ -52,11 +51,12 @@ class NativeBannerAdSize {
 
 class NativeAd extends StatefulWidget {
   static const testPlacementId = 'YOUR_PLACEMENT_ID';
+
   /// Replace the default one with your placement ID for the release build.
   final String placementId;
 
   /// Native Ad listener.
-  final void Function(NativeAdResult, dynamic)? listener;
+  final NativeAdListener? listener;
 
   /// Choose between [NativeAdType.NATIVE_AD] and
   /// [NativeAdType.NATIVE_BANNER_AD]
@@ -284,50 +284,41 @@ class _NativeAdState extends State<NativeAd>
   void _onNativeAdViewCreated(int id) {
     final channel = MethodChannel('${NATIVE_AD_CHANNEL}_$id');
 
-    channel.setMethodCallHandler((MethodCall call) {
+    channel.setMethodCallHandler((MethodCall call) async {
+      final args = call.arguments;
       switch (call.method) {
         case ERROR_METHOD:
-          if (widget.listener != null)
-            widget.listener!(NativeAdResult.ERROR, call.arguments);
+          final errorCode = args['error_code'];
+          final errorMessage = args['error_message'];
+          widget.listener?.onError?.call(errorCode, errorMessage);
           break;
         case LOADED_METHOD:
-          if (widget.listener != null)
-            widget.listener!(NativeAdResult.LOADED, call.arguments);
+          if (!isAdReady) setState(() => isAdReady = true);
 
-          if (!isAdReady) {
-            setState(() {
-              isAdReady = true;
-            });
-          }
+          widget.listener?.onLoaded?.call();
 
           /// ISSUE: Changing height on Ad load causes the ad button to not work
           /*setState(() {
             containerHeight = widget.height;
           });*/
           break;
-        case LOAD_SUCCESS_METHOD:
-          if (!mounted) Future<dynamic>.value(true);
-          if (!isAdReady) {
-            setState(() {
-              isAdReady = true;
-            });
-          }
-          break;
+        // TODO(lslv1243): there was this case that was being called
+        //  after ad has been presented, but it was only implemented
+        //  on android
+        // case LOAD_SUCCESS_METHOD:
+        //   if (!mounted) return;
+        //   if (!isAdReady) setState(() => isAdReady = true);
+        //   break;
         case CLICKED_METHOD:
-          if (widget.listener != null)
-            widget.listener!(NativeAdResult.CLICKED, call.arguments);
+          widget.listener?.onClicked?.call();
           break;
         case LOGGING_IMPRESSION_METHOD:
-          if (widget.listener != null)
-            widget.listener!(NativeAdResult.LOGGING_IMPRESSION, call.arguments);
+          widget.listener?.onLoggingImpression?.call();
           break;
         case MEDIA_DOWNLOADED_METHOD:
-          if (widget.listener != null)
-            widget.listener!(NativeAdResult.MEDIA_DOWNLOADED, call.arguments);
+          widget.listener?.onMediaDownloaded?.call();
           break;
       }
-
-      return Future<dynamic>.value(true);
     });
   }
 }
