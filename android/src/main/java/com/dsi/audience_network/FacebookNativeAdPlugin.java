@@ -139,37 +139,36 @@ class FacebookNativeAdView implements PlatformView, NativeAdListener {
 
     @Override
     public void onAdLoaded(Ad ad) {
-        HashMap<String, Object> args = new HashMap<>();
+        final HashMap<String, Object> args = new HashMap<>();
         args.put("placement_id", ad.getPlacementId());
         args.put("invalidated", ad.isAdInvalidated());
-        channel.invokeMethod(FacebookConstants.LOADED_METHOD, args);
-//        adView.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                showNativeAd();
-//            }
-//        }, 200);
+        adView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                showNativeAd(args);
+            }
+        }, 200);
     }
 
-//    private void showNativeAd() {
-//        if (adView.getChildCount() > 0)
-//            adView.removeAllViews();
-//
-//        if ((boolean) this.args.get("banner_ad")) {
-//            adView.addView(NativeBannerAdView.render(this.context,
-//                    this.bannerAd,
-//                    getBannerSize(this.args),
-//                    getViewAttributes(this.context, this.args)));
-//        } else {
-//            //View view = inflateView();
-//            // adView.addView(view);
-//            adView.addView(NativeAdView.render(this.context,
-//                    this.nativeAd,
-//                    getViewAttributes(this.context, this.args)));
-//        }
-//
-//        channel.invokeMethod(FacebookConstants.LOADED_METHOD, args);
-//    }
+    private void showNativeAd(HashMap<String, Object> loadedArgs) {
+        if (adView.getChildCount() > 0)
+            adView.removeAllViews();
+
+        if ((boolean) this.args.get("banner_ad")) {
+            adView.addView(NativeBannerAdView.render(this.context,
+                    this.bannerAd,
+                    getBannerSize(this.args),
+                    getViewAttributes(this.context, this.args)));
+        } else {
+            //View view = inflateView();
+            // adView.addView(view);
+            adView.addView(NativeAdView.render(this.context,
+                    this.nativeAd,
+                    getViewAttributes(this.context, this.args)));
+        }
+
+        channel.invokeMethod(FacebookConstants.LOADED_METHOD, loadedArgs);
+    }
 
     @Override
     public void onAdClicked(Ad ad) {
