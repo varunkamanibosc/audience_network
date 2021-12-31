@@ -47,24 +47,16 @@ In Pod file, set the IOS deployment target version to 9.0
 Container(
   alignment: Alignment(0.5, 1),
   child: BannerAd(
-    placementId: Platform.isAndroid ? "YOUR_ANDROID_PLACEMENT_ID" : "YOUR_IOS_PLACEMENT_ID",
+    placementId: Platform.isAndroid
+        ? "YOUR_ANDROID_PLACEMENT_ID"
+        : "YOUR_IOS_PLACEMENT_ID",
     bannerSize: BannerSize.STANDARD,
-    listener: (result, value) {
-      switch (result) {
-        case BannerAdResult.ERROR:
-          print("Error: $value");
-          break;
-        case BannerAdResult.LOADED:
-          print("Loaded: $value");
-          break;
-        case BannerAdResult.CLICKED:
-          print("Clicked: $value");
-          break;
-        case BannerAdResult.LOGGING_IMPRESSION:
-          print("Logging Impression: $value");
-          break;
-      }
-    },
+    listener: BannerAdListener(
+      onError: (code, message) => print('error'),
+      onLoaded: () => print('loaded'),
+      onClicked: () => print('clicked'),
+      onLoggingImpression: () => print('logging impression'),
+    ),
   ),
 )
 ```
@@ -118,13 +110,20 @@ NativeAd(
   buttonColor: Colors.deepPurple,
   buttonTitleColor: Colors.white,
   buttonBorderColor: Colors.white,
-  keepAlive: true, //set true if you do not want adview to refresh on widget rebuild
-  keepExpandedWhileLoading: false, // set false if you want to collapse the native ad view when the ad is loading 
-  expandAnimationDuraion: 300, //in milliseconds. Expands the adview with animation when ad is loaded
-  listener: (result, value) {
-    print("Native Ad: $result --> $value");
-  },
-),
+  //set true if you do not want adview to refresh on widget rebuild
+  keepAlive: true,
+  // set false if you want to collapse the native ad view when the ad is loading
+  keepExpandedWhileLoading: false, 
+  //in milliseconds. Expands the adview with animation when ad is loaded
+  expandAnimationDuraion: 300, 
+  listener: NativeAdListener(
+    onError: (code, message) => print('error'),
+    onLoaded: () => print('loaded'),
+    onClicked: () => print('clicked'),
+    onLoggingImpression: () => print('logging impression'),
+    onMediaDownloaded: () => print('media downloaded'),
+  ),
+)
 ```
 ---
 ### 6. Show Native Banner Ad:
@@ -142,10 +141,14 @@ NativeAd(
   buttonColor: Colors.deepPurple,
   buttonTitleColor: Colors.white,
   buttonBorderColor: Colors.white,
-  listener: (result, value) {
-    print("Native Ad: $result --> $value");
-  },
-),
+  listener: NativeAdListener(
+    onError: (code, message) => print('error'),
+    onLoaded: () => print('loaded'),
+    onClicked: () => print('clicked'),
+    onLoggingImpression: () => print('logging impression'),
+    onMediaDownloaded: () => print('media downloaded'),
+  ),
+)
 ```
 ---
 **Check out the [example](https://github.com/lslv1243/facebook_audience_network/tree/master/example) for complete implementation.**
