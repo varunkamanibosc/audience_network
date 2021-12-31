@@ -24,18 +24,18 @@ class BannerSize {
   const BannerSize({this.width = 320, this.height = 50});
 }
 
-enum BannerAdResult {
-  /// Banner Ad error.
-  ERROR,
+class BannerAdListener {
+  final void Function(int code, String message)? onError;
+  final void Function()? onLoaded;
+  final void Function()? onClicked;
+  final void Function()? onLoggingImpression;
 
-  /// Banner Ad loaded successfully.
-  LOADED,
-
-  /// Banner Ad clicked.
-  CLICKED,
-
-  /// Banner Ad impression logged.
-  LOGGING_IMPRESSION,
+  BannerAdListener({
+    this.onError,
+    this.onLoaded,
+    this.onClicked,
+    this.onLoggingImpression,
+  });
 }
 
 class BannerAd extends StatefulWidget {
@@ -49,7 +49,7 @@ class BannerAd extends StatefulWidget {
   final BannerSize bannerSize;
 
   /// Banner Ad listener
-  final void Function(BannerAdResult, dynamic)? listener;
+  final BannerAdListener? listener;
 
   /// This defines if the ad view to be kept alive.
   final bool keepAlive;
@@ -142,11 +142,13 @@ class _BannerAdState extends State<BannerAd>
   void _onBannerAdViewCreated(int id) async {
     final channel = MethodChannel('${BANNER_AD_CHANNEL}_$id');
 
-    channel.setMethodCallHandler((MethodCall call) {
+    channel.setMethodCallHandler((MethodCall call) async {
+      final args = call.arguments;
       switch (call.method) {
         case ERROR_METHOD:
-          if (widget.listener != null)
-            widget.listener!(BannerAdResult.ERROR, call.arguments);
+          final errorCode = args['error_code'];
+          final errorMessage = args['error_message'];
+          widget.listener?.onError?.call(errorCode, errorMessage);
           break;
         case LOADED_METHOD:
           setState(() {
@@ -154,20 +156,15 @@ class _BannerAdState extends State<BannerAd>
                 ? double.infinity
                 : widget.bannerSize.height.toDouble();
           });
-          if (widget.listener != null)
-            widget.listener!(BannerAdResult.LOADED, call.arguments);
+          widget.listener?.onLoaded?.call();
           break;
         case CLICKED_METHOD:
-          if (widget.listener != null)
-            widget.listener!(BannerAdResult.CLICKED, call.arguments);
+          widget.listener?.onClicked?.call();
           break;
         case LOGGING_IMPRESSION_METHOD:
-          if (widget.listener != null)
-            widget.listener!(BannerAdResult.LOGGING_IMPRESSION, call.arguments);
+          widget.listener?.onLoggingImpression?.call();
           break;
       }
-
-      return Future<dynamic>.value(true);
     });
   }
 }
