@@ -100,7 +100,7 @@ rewardedAd.load();
 - NativeAdType NATIVE_AD_HORIZONTAL & NATIVE_AD_VERTICAL ad types are supported only in iOS. In Android use NATIVE_AD.
 ```dart
 NativeAd(
-  placementId: "YOUR_PLACEMENT_ID",
+  placementId: NativeAd.testPlacementId,
   adType: NativeAdType.NATIVE_AD,
   width: double.infinity,
   height: 300,
@@ -131,7 +131,7 @@ Use `NativeBannerAdSize` to choose the height for Native banner ads. `height` pr
 
 ```dart
 NativeAd(
-  placementId: "YOUR_PLACEMENT_ID",
+  placementId: NativeAd.testPlacementId,
   adType: NativeAdType.NATIVE_BANNER_AD,
   bannerAdSize: NativeBannerAdSize.HEIGHT_100,
   width: double.infinity,
