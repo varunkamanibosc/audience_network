@@ -1,3 +1,7 @@
+## 0.0.4
+
+- Updated NativeAd and Banner listener interface for consistency
+
 ## 0.0.3
 
 - Fix CHANGELOG
