@@ -72,7 +72,7 @@ Container(
 ### 3. Show Interstitial Ad:
 
 ```dart
-final interstitialAd = InterstitialAd('YOUR_PLACEMENT_ID');
+final interstitialAd = InterstitialAd(InterstitialAd.testPlacementId);
 interstitialAd.listener = InterstitialAdListener(
   onLoaded: () {
     interstitialAd.show();
@@ -89,7 +89,7 @@ interstitialAd.load();
 
 ```dart
 final rewardedAd = RewardedAd(
-  'YOUR_PLACEMENT_ID',
+  RewardedAd.testPlacementId,
   userId: 'some_user_id', // optional for server side verification
 );
 rewardedAd.listener = RewardedAdListener(

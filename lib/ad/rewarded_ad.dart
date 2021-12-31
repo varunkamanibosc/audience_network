@@ -19,6 +19,7 @@ class RewardedAdListener {
 }
 
 class RewardedAd {
+  static const testPlacementId = 'YOUR_PLACEMENT_ID';
   static var _lastId = -1;
 
   var _loaded = false;

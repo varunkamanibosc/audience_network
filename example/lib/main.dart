@@ -68,7 +68,7 @@ class AdsPageState extends State<AdsPage> {
   }
 
   void _loadInterstitialAd() {
-    final interstitialAd = InterstitialAd('YOUR_PLACEMENT_ID');
+    final interstitialAd = InterstitialAd(InterstitialAd.testPlacementId);
     interstitialAd.listener = InterstitialAdListener(
       onLoaded: () {
         _isInterstitialAdLoaded = true;
@@ -89,7 +89,7 @@ class AdsPageState extends State<AdsPage> {
   }
 
   void _loadRewardedVideoAd() {
-    final rewardedAd = RewardedAd('YOUR_PLACEMENT_ID');
+    final rewardedAd = RewardedAd(RewardedAd.testPlacementId);
     rewardedAd.listener = RewardedAdListener(
       onLoaded: () {
         _isRewardedAdLoaded = true;
@@ -195,9 +195,7 @@ class AdsPageState extends State<AdsPage> {
   _showBannerAd() {
     setState(() {
       _currentAd = BannerAd(
-        // placementId: "YOUR_PLACEMENT_ID",
-        placementId:
-            "IMG_16_9_APP_INSTALL#2312433698835503_2964944860251047", //testid
+        placementId: BannerAd.testPlacementId,
         bannerSize: BannerSize.STANDARD,
         listener: (result, value) {
           print("Banner Ad: $result -->  $value");
@@ -214,8 +212,7 @@ class AdsPageState extends State<AdsPage> {
 
   Widget _nativeBannerAd() {
     return NativeAd(
-      // placementId: "YOUR_PLACEMENT_ID",
-      placementId: "IMG_16_9_APP_INSTALL#2312433698835503_2964953543583512",
+      placementId: NativeAd.testPlacementId,
       adType: NativeAdType.NATIVE_BANNER_AD,
       bannerAdSize: NativeBannerAdSize.HEIGHT_100,
       width: double.infinity,

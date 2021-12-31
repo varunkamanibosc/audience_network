@@ -51,6 +51,7 @@ class NativeBannerAdSize {
 }
 
 class NativeAd extends StatefulWidget {
+  static const testPlacementId = 'YOUR_PLACEMENT_ID';
   /// Replace the default one with your placement ID for the release build.
   final String placementId;
 
@@ -110,7 +111,7 @@ class NativeAd extends StatefulWidget {
   /// banner ads.
   NativeAd({
     Key? key,
-    this.placementId = "YOUR_PLACEMENT_ID",
+    this.placementId = NativeAd.testPlacementId,
     this.listener,
     required this.adType,
     this.bannerAdSize = NativeBannerAdSize.HEIGHT_50,

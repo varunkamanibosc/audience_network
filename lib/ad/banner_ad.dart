@@ -39,6 +39,7 @@ enum BannerAdResult {
 }
 
 class BannerAd extends StatefulWidget {
+  static const testPlacementId = 'YOUR_PLACEMENT_ID';
   final Key? key;
 
   /// Replace the default one with your placement ID for the release build.
@@ -70,7 +71,7 @@ class BannerAd extends StatefulWidget {
   /// ```
   BannerAd({
     this.key,
-    this.placementId = "YOUR_PLACEMENT_ID",
+    this.placementId = BannerAd.testPlacementId,
     this.bannerSize = BannerSize.STANDARD,
     this.listener,
     this.keepAlive = false,
@@ -140,9 +141,8 @@ class _BannerAdState extends State<BannerAd>
 
   void _onBannerAdViewCreated(int id) async {
     final channel = MethodChannel('${BANNER_AD_CHANNEL}_$id');
-    
-    channel.setMethodCallHandler((MethodCall call) {
 
+    channel.setMethodCallHandler((MethodCall call) {
       switch (call.method) {
         case ERROR_METHOD:
           if (widget.listener != null)
