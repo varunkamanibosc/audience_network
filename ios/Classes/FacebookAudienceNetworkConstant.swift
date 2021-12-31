@@ -19,8 +19,6 @@ struct FANConstant{
     static let ID_ARG = "id"
     static let PLACEMENT_ID_ARG = "placement_id";
     static let INVALIDATED_ARG = "invalidated";
-    static let CODE_ARG = "code";
-    static let ERROR_ARG = "error";
     static let ERROR_CODE_ARG = "error_code"
     static let ERROR_MESSAGE_ARG = "error_message"
 

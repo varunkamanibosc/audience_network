@@ -205,13 +205,14 @@ class FacebookAudienceNetworkBannerAdView: NSObject, FlutterPlatformView, FBAdVi
      */
     func  adView(_ adView :FBAdView, didFailWithError error: Error) {
         print("BannerAdView > adView")
+        let errorDetails = FacebookAdErrorDetails(fromSDKError: error)
         let placement_id: String = adView.placementID
         let invalidated: Bool = adView.isAdValid
-        let errorStr: String = error.localizedDescription
         let arg: [String: Any] = [
             FANConstant.PLACEMENT_ID_ARG: placement_id,
             FANConstant.INVALIDATED_ARG: invalidated,
-            FANConstant.ERROR_ARG:errorStr
+            FANConstant.ERROR_CODE_ARG: errorDetails?.code as Any,
+            FANConstant.ERROR_MESSAGE_ARG: errorDetails?.message as Any,
         ]
         self.channel.invokeMethod(FANConstant.ERROR_METHOD, arguments: arg)
     }
