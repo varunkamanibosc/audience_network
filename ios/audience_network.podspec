@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'audience_network'
-  s.version          = '0.0.1'
+  s.version          = '0.0.5'
   s.summary          = 'Facebook Audience Network plugin for Flutter application'
   s.description      = <<-DESC
 Facebook Audience Network plugin for Flutter application
