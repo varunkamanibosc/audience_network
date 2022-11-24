@@ -67,7 +67,6 @@ class FacebookRewardedVideoAdPlugin implements MethodChannel.MethodCallHandler {
                 final RewardedVideoAd capturedAd = rewardedVideoAd;
                 RewardedVideoAd.RewardedVideoLoadAdConfig loadAdConfig = rewardedVideoAd
                         .buildLoadAdConfig()
-                        .withRewardData(rewardData)
                         .withAdListener(new RewardedVideoAdListener() {
                             @Override
                             public void onRewardedVideoCompleted() {
